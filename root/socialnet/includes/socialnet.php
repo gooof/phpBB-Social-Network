@@ -82,6 +82,8 @@ class socialnet extends snFunctions
 
 	var $memory_usage = array();
 
+	var $sn_hooks = null;
+
 	/**
 	 * Construction function
 	 * Prepare active modules
@@ -95,6 +97,7 @@ class socialnet extends snFunctions
 		$this->socialnet_root_path = $socialnet_root_path;
 		$this->script_name = str_replace('.' . $phpEx, '', $user->page['page_name']);
 		$this->config =& $config;
+		$this->sn_hook = new sn_hook();
 
 		// Extend Config data;
 		$sql = "SELECT config_name, config_value FROM " . SN_CONFIG_TABLE . " WHERE config_name <> 'sn_global_enable'";
