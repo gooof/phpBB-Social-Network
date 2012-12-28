@@ -82,7 +82,7 @@ class socialnet extends snFunctions
 
 	var $memory_usage = array();
 
-	var $sn_hook = null;
+	var $hook = null;
 
 	/**
 	 * Construction function
@@ -97,7 +97,7 @@ class socialnet extends snFunctions
 		$this->socialnet_root_path = $socialnet_root_path;
 		$this->script_name = str_replace('.' . $phpEx, '', $user->page['page_name']);
 		$this->config =& $config;
-		$this->sn_hook = new sn_hook();
+		$this->hook = new sn_hook();
 
 		// Extend Config data;
 		$sql = "SELECT config_name, config_value FROM " . SN_CONFIG_TABLE . " WHERE config_name <> 'sn_global_enable'";
@@ -208,7 +208,7 @@ class socialnet extends snFunctions
 		 * @since 1.0.0
 		 */
 		$vars = array();
-		extract($this->sn_hook->do_action('sn.socialnet_socialnet_after', compact($vars)));
+		extract($this->hook->do_action('sn.socialnet_socialnet_after', compact($vars)));
 	}
 
 	/**
@@ -1160,7 +1160,7 @@ class socialnet extends snFunctions
 			 * @since 1.0.0
 			 */
 			$vars = array('additional_copy');
-			extract($this->sn_hook->do_action('sn.copyright_append', compact($vars)));
+			extract($this->hook->do_action('sn.copyright_append', compact($vars)));
 
 			$copy_string .= $additional_copy;
 
