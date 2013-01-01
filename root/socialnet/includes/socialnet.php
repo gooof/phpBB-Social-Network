@@ -115,7 +115,8 @@ class socialnet extends snFunctions
 				/* DOCASNE ODEBRANO - OPRAVNENI POUZIT MODUL */
 				$permission_allow = ($user->data['is_registered'] == 1 || $row['config_name'] == 'module_activitypage') ? true : false;
 
-				if ($this->_permission_exists('u_sn_' . $module_match[1]))
+				$sn_u_permissions = unserialize(SN_U_PERMISSIONS);
+				if (in_array($module_match[1], $sn_u_permissions))
 				{
 					$permission_allow = $auth->acl_get('u_sn_' . $module_match[1]);
 				}
