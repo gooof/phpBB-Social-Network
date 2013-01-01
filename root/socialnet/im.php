@@ -121,8 +121,8 @@ if (!class_exists('socialnet_im'))
 			$closeKey = $this->_keyboardString($this->closeSequence);
 			$sendKey = $this->_keyboardString($this->sendSequence);
 
-			$sql = "SELECT * FROM " . SN_SMILIES_TABLE . " WHERE smiley_allowed = 1";
-			// cache for 1 year - smilies can be reloaded purging the cache
+			$sql = 'SELECT * FROM ' . SN_SMILIES_TABLE . ' WHERE smiley_allowed = 1';
+			// cache for 1 year - reload when you change smiley settings in ACP
 			$rs = $db->sql_query($sql, 60*60*24*365);
 
 			$exist_smiley = $db->sql_affectedrows($rs);
