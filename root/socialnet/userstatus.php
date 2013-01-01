@@ -763,7 +763,7 @@ if (!class_exists('socialnet_userstatus'))
 			global $db, $user;
 
 			$user_id = (int) request_var('u', $user->data['user_id']);
-			$username = request_var('un', '');
+			$username = utf8_normalize_nfc(request_var('un', '', true));
 
 			if (empty($username))
 			{
