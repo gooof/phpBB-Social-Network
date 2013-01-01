@@ -76,7 +76,8 @@ if (!class_exists('socialnet_profile'))
 			$sql = "SELECT emote_id, emote_name, emote_image
 							FROM " . SN_EMOTES_TABLE . "
 								ORDER BY emote_order";
-			$rs = $db->sql_query($sql);
+			// cache result for 1 year. You can use cache purging to reload emotes
+			$rs = $db->sql_query($sql, 60*60*24*365);
 			$row_emotes = $db->sql_fetchrowset($rs);
 			$db->sql_freeresult($rs);
 

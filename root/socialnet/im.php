@@ -122,7 +122,8 @@ if (!class_exists('socialnet_im'))
 			$sendKey = $this->_keyboardString($this->sendSequence);
 
 			$sql = "SELECT * FROM " . SN_SMILIES_TABLE . " WHERE smiley_allowed = 1";
-			$rs = $db->sql_query($sql);
+			// cache for 1 year - smilies can be reloaded purging the cache
+			$rs = $db->sql_query($sql, 60*60*24*365);
 
 			$exist_smiley = $db->sql_affectedrows($rs);
 
@@ -540,7 +541,7 @@ if (!class_exists('socialnet_im'))
 			$b_no_avatar_me = stripos($this->config['my_avatar'], 'socialnet/no_avatar') !== false ? true : false;
 
 			$play_sound_on_load = false;
-			
+
 			for ($i = 0; isset($chatBoxRowSet[$i]); $i++)
 			{
 				$row = $chatBoxRowSet[$i];
@@ -636,7 +637,7 @@ if (!class_exists('socialnet_im'))
 
 				$this->_markRecievedMessages();
 			}
-			
+
 			$template->assign_var('SN_IM_PLAY_SOUND_ON_PAGELOAD', $play_sound_on_load ? 'true' : 'false');
 		}
 
@@ -950,13 +951,39 @@ if (!class_exists('socialnet_im'))
 
 		function _open_chatbox_avatar($uidTo)
 		{
-			global $db, $phpbb_root_path;
-			$sql = "SELECT user_avatar, user_avatar_type, user_avatar_width, user_avatar_height
-								FROM " . USERS_TABLE . "
-									WHERE user_id = '{$uidTo}'";
-			$rs = $db->sql_query($sql);
-			$rowAvatar = $db->sql_fetchrow($rs);
-			$db->sql_freeresult($rs);
+			global $db, $user, $phpbb_root_path, $chat_avatars;
+
+			$sql = 'SELECT user_avatar, user_avatar_type, user_avatar_width, user_avatar_height
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . (int) $uidTo;
+			$sql_md5 = md5($sql);
+
+
+			if ( isset($chat_avatars[$sql_md5]) )
+			{
+				$rowAvatar = $chat_avatars[$sql_md5];
+			}
+			else
+			{
+				// perform sql request only if we do not already have those data
+				if ( $uidTo == $user->data['user_id'] )
+				{
+					$rowAvatar = array(
+						'user_avatar'	=> $user->data['user_avatar'],
+						'user_avatar_type'	=> $user->data['user_avatar_type'],
+						'user_avatar_width'	=> $user->data['user_avatar_width'],
+						'user_avatar_height'	=> $user->data['user_avatar_height'],
+					);
+				}
+				else
+				{
+					$rs = $db->sql_query($sql);
+					$rowAvatar = $db->sql_fetchrow($rs);
+					$db->sql_freeresult($rs);
+				}
+				// cache query
+				$chat_avatars[$sql_md5] = $rowAvatar;
+			}
 
 			return $this->p_master->get_user_avatar_resized($rowAvatar['user_avatar'], $rowAvatar['user_avatar_type'], $rowAvatar['user_avatar_width'], $rowAvatar['user_avatar_height'], 30);
 		}
