@@ -62,7 +62,7 @@ if ($user_id == ANONYMOUS && !$username)
 }
 
 // Select data for left column
-if ( ($username && $db->sql_escape(utf8_clean_string($username)) == $user->data['username_clean']) || $user_id == $user->data['user_id'] )
+if ( ($username && utf8_clean_string($username) == $user->data['username_clean']) || $user_id == $user->data['user_id'] )
 {
 	$member = array(
 		'user_id'	=> $user->data['user_id'],
