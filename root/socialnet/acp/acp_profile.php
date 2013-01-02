@@ -189,18 +189,15 @@ class acp_profile extends socialnet
 			case 'add':
 			case 'edit':
 				$this->emote_edit($error);
-				$this->_emote_refresh_cache();
 			break;
 
 			case 'mdown':
 			case 'mup':
 				$this->emote_order($error, $action);
-				$this->_emote_refresh_cache();
 			break;
 
 			case 'delete':
 				$this->emote_delete($error);
-				$this->_emote_refresh_cache();
 			break;
 		}
 
@@ -244,6 +241,8 @@ class acp_profile extends socialnet
 
 		$sql = "UPDATE " . SN_EMOTES_TABLE . " SET emote_order = {$emote_neworder} WHERE emote_id = {$emote_id}";
 		$db->sql_query($sql);
+
+		$this->_emote_refresh_cache();
 	}
 
 	function emote_edit(&$error)
@@ -311,6 +310,8 @@ class acp_profile extends socialnet
 
 				$db->sql_query($sql);
 
+				$this->_emote_refresh_cache();
+
 				trigger_error($message . adm_back_link($this->p_master->u_action . '&amp;manage=emotes'));
 			}
 		}
@@ -371,6 +372,8 @@ class acp_profile extends socialnet
 
 		$sql = "DELETE FROM " . SN_EMOTES_TABLE . " WHERE emote_id = {$emote_id}";
 		$db->sql_query($sql);
+
+		$this->_emote_refresh_cache();
 
 		trigger_error($user->lang['SN_PROFILE_EMOTE_DELETED'] . adm_back_link($this->p_master->u_action . '&amp;manage=emotes'));
 	}
