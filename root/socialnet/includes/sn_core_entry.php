@@ -13,6 +13,8 @@ if (!defined('SOCIALNET_INSTALLED') || !defined('IN_PHPBB'))
 	return;
 }
 
+$id_name_color_cache = array();
+
 class sn_core_entry extends sn_core_entry_gets
 {
 	var $p_master = null;
@@ -354,26 +356,66 @@ class sn_core_entry_gets
 	 */
 	function entry_friends($entry_uid, $entry_target)
 	{
-		global $db;
+		global $db, $user, $id_name_color_cache;
 
 		if (!isset($this->friends_entry[$entry_uid]))
 		{
-			$sql = "SELECT user_id, username, user_colour
-					FROM " . USERS_TABLE . "
-					WHERE user_id = " . $entry_uid;
-			$u1_result = $db->sql_query($sql);
-			$this->friends_entry[$entry_uid] = $db->sql_fetchrow($u1_result);
-			$db->sql_freeresult($u1_result);
+			$sql = 'SELECT user_id, username, user_colour
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . $entry_uid;
+			$sql_md5 = md5( preg_replace('/\s+/', '', $sql) );
+
+			if( isset($id_name_color_cache[$sql_md5]) )
+			{
+				$this->friends_entry[$entry_uid] = $id_name_color_cache[$sql_md5];
+			}
+			else
+			{
+				if ( $entry_uid == $user->data['user_id'] )
+				{
+					$this->friends_entry[$entry_uid] = $id_name_color_cache[$sql_md5] = array(
+						'user_id'	=> $user->data['user_id'],
+						'username'	=> $user->data['username'],
+						'user_colour'	=> $user->data['user_colour'],
+					);
+				}
+				else
+				{
+					$u1_result = $db->sql_query($sql);
+					$this->friends_entry[$entry_uid] = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($u1_result);
+					$db->sql_freeresult($u1_result);
+				}
+			}
 		}
 
 		if (!isset($this->friends_entry[$entry_target]))
 		{
-			$sql = "SELECT user_id, username, user_colour
-					FROM " . USERS_TABLE . "
-					WHERE user_id = " . $entry_target;
-			$u2_result = $db->sql_query($sql);
-			$this->friends_entry[$entry_target] = $db->sql_fetchrow($u2_result);
-			$db->sql_freeresult($u2_result);
+			$sql = 'SELECT user_id, username, user_colour
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . $entry_target;
+			$sql_md5 = md5( preg_replace('/\s+/', '', $sql) );
+
+			if( isset($id_name_color_cache[$sql_md5]) )
+			{
+				$this->friends_entry[$entry_target] = $id_name_color_cache[$sql_md5];
+			}
+			else
+			{
+				if ( $entry_target == $user->data['user_id'] )
+				{
+					$this->friends_entry[$entry_target] = $id_name_color_cache[$sql_md5] = array(
+						'user_id'	=> $user->data['user_id'],
+						'username'	=> $user->data['username'],
+						'user_colour'	=> $user->data['user_colour'],
+					);
+				}
+				else
+				{
+					$u2_result = $db->sql_query($sql);
+					$this->friends_entry[$entry_target] = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($u2_result);
+					$db->sql_freeresult($u2_result);
+				}
+			}
 		}
 
 		return array(
@@ -389,14 +431,34 @@ class sn_core_entry_gets
 	 */
 	function entry_profile($entry_uid, $entry_target, $entry_additionals = '')
 	{
-		global $db, $template, $user;
+		global $db, $template, $user, $id_name_color_cache;
 
 		$sql = "SELECT user_id, username, user_colour
 		        FROM " . USERS_TABLE . "
 				WHERE user_id = " . $entry_uid;
-		$result = $db->sql_query($sql);
-		$entry_user = $db->sql_fetchrow($result);
-		$db->sql_freeresult($result);
+		$sql_md5 = md5( preg_replace('/\s+/', '', $sql) );
+
+		if( isset($id_name_color_cache[$sql_md5]) )
+		{
+			$entry_user = $id_name_color_cache[$sql_md5];
+		}
+		else
+		{
+			if ( $entry_target == $user->data['user_id'] )
+			{
+				$entry_user = $id_name_color_cache[$sql_md5] = array(
+					'user_id'	=> $user->data['user_id'],
+					'username'	=> $user->data['username'],
+					'user_colour'	=> $user->data['user_colour'],
+				);
+			}
+			else
+			{
+				$result = $db->sql_query($sql);
+				$entry_user = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+		}
 
 		$entry_add = '';
 
@@ -459,14 +521,34 @@ class sn_core_entry_gets
 	 */
 	function entry_relation($entry_type, $entry_uid, $entry_target, $entry_additionals = '')
 	{
-		global $db, $template, $phpbb_root_path, $phpEx, $socialnet, $user;
+		global $db, $template, $phpbb_root_path, $phpEx, $socialnet, $user, $id_name_color_cache;
 
-		$sql = "SELECT user_id, username, user_colour
-		FROM " . USERS_TABLE . "
-		WHERE user_id = " . $entry_uid;
-		$result = $db->sql_query($sql);
-		$entry_user = $db->sql_fetchrow($result);
-		$db->sql_freeresult($result);
+		$sql = 'SELECT user_id, username, user_colour
+				FROM ' . USERS_TABLE . '
+				WHERE user_id = ' . $entry_uid;
+		$sql_md5 = md5( preg_replace('/\s+/', '', $sql) );
+
+		if( isset($id_name_color_cache[$sql_md5]) )
+		{
+			$entry_user = $id_name_color_cache[$sql_md5];
+		}
+		else
+		{
+			if ( $entry_target == $user->data['user_id'] )
+			{
+				$entry_user = $id_name_color_cache[$sql_md5] = array(
+					'user_id'	=> $user->data['user_id'],
+					'username'	=> $user->data['username'],
+					'user_colour'	=> $user->data['user_colour'],
+				);
+			}
+			else
+			{
+				$result = $db->sql_query($sql);
+				$entry_user = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+		}
 
 		$partner_id = $family_id = 0;
 		$partner_name = $family_name = $rel_msg = $family_msg = '';
@@ -562,21 +644,61 @@ class sn_core_entry_gets
 	 */
 	function entry_emote($entry_uid, $entry_target, $entry_additionals = '')
 	{
-		global $db, $template, $phpbb_root_path, $phpEx;
+		global $db, $template, $phpbb_root_path, $phpEx, $id_name_color_cache;
 
-		$sql = "SELECT user_id, username, user_colour
-				FROM " . USERS_TABLE . "
-				WHERE user_id = " . $entry_uid;
-		$result = $db->sql_query($sql);
-		$entry_user = $db->sql_fetchrow($result);
-		$db->sql_freeresult($result);
+		$sql = 'SELECT user_id, username, user_colour
+				FROM ' . USERS_TABLE . '
+				WHERE user_id = ' . $entry_uid;
+		$sql_md5 = md5( preg_replace('/\s+/', '', $sql) );
 
-		$u2_sql = "SELECT user_id, username, user_colour
-				FROM " . USERS_TABLE . "
-				WHERE user_id = " . $entry_target;
-		$u2_result = $db->sql_query($u2_sql);
-		$user2 = $db->sql_fetchrow($u2_result);
-		$db->sql_freeresult($u2_result);
+		if( isset($id_name_color_cache[$sql_md5]) )
+		{
+			$entry_user = $id_name_color_cache[$sql_md5];
+		}
+		else
+		{
+			if ( $entry_target == $user->data['user_id'] )
+			{
+				$entry_user = $id_name_color_cache[$sql_md5] = array(
+					'user_id'	=> $user->data['user_id'],
+					'username'	=> $user->data['username'],
+					'user_colour'	=> $user->data['user_colour'],
+				);
+			}
+			else
+			{
+				$result = $db->sql_query($sql);
+				$entry_user = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($result);
+				$db->sql_freeresult($result);
+			}
+		}
+
+		$u2_sql = 'SELECT user_id, username, user_colour
+					FROM ' . USERS_TABLE . '
+					WHERE user_id = ' . $entry_target;
+		$sql_md5 = md5( preg_replace('/\s+/', '', $u2_sql) );
+
+		if( isset($id_name_color_cache[$sql_md5]) )
+		{
+			$user2 = $id_name_color_cache[$sql_md5];
+		}
+		else
+		{
+			if ( $entry_target == $user->data['user_id'] )
+			{
+				$user2 = $id_name_color_cache[$sql_md5] = array(
+					'user_id'	=> $user->data['user_id'],
+					'username'	=> $user->data['username'],
+					'user_colour'	=> $user->data['user_colour'],
+				);
+			}
+			else
+			{
+				$u2_result = $db->sql_query($sql);
+				$user2 = $id_name_color_cache[$sql_md5] = $db->sql_fetchrow($u2_result);
+				$db->sql_freeresult($u2_result);
+			}
+		}
 
 		$entry_addArray = unserialize($entry_additionals);
 		$emote_id = $entry_addArray['emote_id'];
